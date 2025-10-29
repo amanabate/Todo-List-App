@@ -9,12 +9,13 @@ function addTask() {
   if (taskText === '') return;
 
   const li = document.createElement('li');
+
   const taskSpan = document.createElement('span');
   taskSpan.textContent = taskText;
 
   const editBtn = document.createElement('button');
   editBtn.textContent = 'Edit';
-  editBtn.onclick = () => editTask(taskSpan);
+  editBtn.onclick = () => editTask(li, taskSpan, editBtn);
 
   const delBtn = document.createElement('button');
   delBtn.textContent = 'Delete';
@@ -28,9 +29,32 @@ function addTask() {
   taskInput.value = '';
 }
 
-function editTask(taskSpan) {
-  const newTask = prompt('Edit task:', taskSpan.textContent);
-  if (newTask !== null && newTask.trim() !== '') {
-    taskSpan.textContent = newTask.trim();
-  }
+function editTask(li, taskSpan, editBtn) {
+  // Create input field
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = taskSpan.textContent;
+  input.className = 'edit-input';
+
+  // Replace span with input
+  li.replaceChild(input, taskSpan);
+
+  // Change Edit button to Save
+  editBtn.textContent = 'Save';
+  editBtn.onclick = () => {
+    taskSpan.textContent = input.value.trim() || taskSpan.textContent;
+    li.replaceChild(taskSpan, input);
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = () => editTask(li, taskSpan, editBtn);
+  };
+
+  // Allow pressing Enter to save
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      editBtn.click();
+    }
+  });
+
+  // Focus input
+  input.focus();
 }
